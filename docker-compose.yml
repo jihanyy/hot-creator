@@ -1,0 +1,12 @@
+services:
+  hot-creator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hot-creator:latest
+    container_name: hot-creator
+    restart: unless-stopped
+    ports:
+      - "20001:8000"
+    env_file:
+      - ./.env

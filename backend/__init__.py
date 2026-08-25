@@ -1,0 +1,1 @@
+"""Hot Creator backend package."""
