@@ -21,7 +21,7 @@ function WorkflowSteps({
           H
         </span>
         <div className="brand-copy">
-          <strong>Hot Creator</strong>
+          <strong>祥子绘境</strong>
           <span>热点内容工作台</span>
         </div>
       </div>
