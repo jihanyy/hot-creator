@@ -9,35 +9,73 @@ import {
   HOTSPOT_NO_MORE_MESSAGE,
 } from '../services/api'
 import type { AIRequestStatus } from '../types/workflow'
-import type { Hotspot, Interest } from '../types/workflow'
+import type { Hotspot, HotspotPageSnapshot, Interest } from '../types/workflow'
 
 interface HotspotListProps {
   interests: Interest[]
   batchIndex: number
+  initialHotspotPage?: HotspotPageSnapshot | null
   selectedHotspot?: Hotspot
   onBack: () => void
   onRefresh: () => void
+  onHotspotPageChange?: (page: HotspotPageSnapshot) => void
   onSelect: (hotspot: Hotspot) => void
+}
+
+function matchesHotspotPage(
+  page: HotspotPageSnapshot | null | undefined,
+  interests: Interest[],
+  batchIndex: number,
+) {
+  return Boolean(
+    page &&
+      page.hotspotBatchIndex === batchIndex &&
+      page.interests.length === interests.length &&
+      page.interests.every((interest, index) => {
+        const currentInterest = interests[index]
+        return (
+          currentInterest &&
+          interest.id === currentInterest.id &&
+          interest.name === currentInterest.name &&
+          interest.isCustom === currentInterest.isCustom
+        )
+      }),
+  )
 }
 
 function HotspotList({
   interests,
   batchIndex,
+  initialHotspotPage,
   selectedHotspot,
   onBack,
   onRefresh,
+  onHotspotPageChange,
   onSelect,
 }: HotspotListProps) {
   const recommendationRequestController = useRef<AbortController | null>(null)
   const [manualHotspotTitle, setManualHotspotTitle] = useState('')
   const [manualHotspotSummary, setManualHotspotSummary] = useState('')
   const requestKey = `${batchIndex}:${interests.map((interest) => interest.id).join(',')}`
+  const matchingInitialHotspotPage = matchesHotspotPage(
+    initialHotspotPage,
+    interests,
+    batchIndex,
+  ) ? initialHotspotPage : null
+  const initialHotspotPageRef = useRef(matchingInitialHotspotPage)
   const [hotspotResult, setHotspotResult] = useState<{
     requestKey: string
     hotspots: Hotspot[]
     error: string | null
     status: AIRequestStatus
-  } | null>(null)
+  } | null>(() => matchingInitialHotspotPage
+    ? {
+        requestKey,
+        hotspots: matchingInitialHotspotPage.hotspots,
+        error: null,
+        status: 'success',
+      }
+    : null)
   const hotspots =
     hotspotResult?.requestKey === requestKey
       ? hotspotResult.hotspots
@@ -48,6 +86,8 @@ function HotspotList({
     : null
 
   useEffect(() => {
+    if (matchesHotspotPage(initialHotspotPageRef.current, interests, batchIndex)) return
+
     let isCurrent = true
     const controller = new AbortController()
     recommendationRequestController.current = controller
@@ -60,6 +100,11 @@ function HotspotList({
             hotspots: nextHotspots,
             error: null,
             status: 'success',
+          })
+          onHotspotPageChange?.({
+            interests,
+            hotspotBatchIndex: batchIndex,
+            hotspots: nextHotspots,
           })
         }
       })
@@ -88,7 +133,7 @@ function HotspotList({
         recommendationRequestController.current = null
       }
     }
-  }, [batchIndex, interests, requestKey])
+  }, [batchIndex, interests, onHotspotPageChange, requestKey])
 
   const useManualHotspot = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()

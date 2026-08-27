@@ -10,6 +10,7 @@ import type {
   CreativeSelection,
   Creative,
   Hotspot,
+  HotspotPageSnapshot,
   Interest,
   Prompt,
   Script,
@@ -23,6 +24,7 @@ const initialWorkflowState: WorkflowState = {
   activeStep: 'field',
   interests: [],
   hotspotBatchIndex: 0,
+  hotspotPage: null,
   hotspot: null,
   creatives: [],
   creativeSelection: null,
@@ -37,6 +39,7 @@ const initialWorkflowState: WorkflowState = {
 type WorkflowAction =
   | { type: 'SET_INTERESTS'; payload: Interest[] }
   | { type: 'REFRESH_HOTSPOTS'; payload: number }
+  | { type: 'UPDATE_HOTSPOT_PAGE'; payload: HotspotPageSnapshot }
   | { type: 'SET_HOTSPOT'; payload: Hotspot }
   | { type: 'UPDATE_CREATIVES'; payload: Creative[] }
   | { type: 'SET_CREATIVE'; payload: CreativeSelection }
@@ -49,6 +52,7 @@ type WorkflowAction =
   | { type: 'SET_PROMPTS'; payload: Prompt[] }
   | { type: 'SET_PROMPT_ERROR'; payload: string }
   | { type: 'GO_TO_STEP'; payload: WorkflowStepId }
+  | { type: 'RESTORE'; payload: WorkflowState }
   | { type: 'RESET' }
 
 function workflowReducer(state: WorkflowState, action: WorkflowAction): WorkflowState {
@@ -78,6 +82,7 @@ function workflowReducer(state: WorkflowState, action: WorkflowAction): Workflow
         ...state,
         activeStep: 'hotspot',
         hotspotBatchIndex: action.payload,
+        hotspotPage: null,
         hotspot: null,
         creatives: [],
         creativeSelection: null,
@@ -88,6 +93,23 @@ function workflowReducer(state: WorkflowState, action: WorkflowAction): Workflow
         promptStatus: 'idle',
         promptError: null,
       }
+    case 'UPDATE_HOTSPOT_PAGE':
+      if (
+        action.payload.hotspotBatchIndex !== state.hotspotBatchIndex ||
+        action.payload.interests.length !== state.interests.length ||
+        action.payload.interests.some((interest, index) => {
+          const currentInterest = state.interests[index]
+          return (
+            !currentInterest ||
+            interest.id !== currentInterest.id ||
+            interest.name !== currentInterest.name ||
+            interest.isCustom !== currentInterest.isCustom
+          )
+        })
+      ) {
+        return state
+      }
+      return { ...state, hotspotPage: action.payload }
     case 'UPDATE_CREATIVES':
       return {
         ...state,
@@ -186,6 +208,8 @@ function workflowReducer(state: WorkflowState, action: WorkflowAction): Workflow
       }
     case 'GO_TO_STEP':
       return { ...state, activeStep: action.payload }
+    case 'RESTORE':
+      return action.payload
     case 'RESET':
       return initialWorkflowState
   }
@@ -223,6 +247,10 @@ export function WorkflowProvider({ children }: WorkflowProviderProps) {
     dispatch({ type: 'UPDATE_STORYBOARDS', payload: storyboards })
   }, [])
 
+  const updateHotspotPage = useCallback((page: HotspotPageSnapshot) => {
+    dispatch({ type: 'UPDATE_HOTSPOT_PAGE', payload: page })
+  }, [])
+
   const value: WorkflowContextValue = {
     state,
     setInterests: (interests) => {
@@ -236,6 +264,7 @@ export function WorkflowProvider({ children }: WorkflowProviderProps) {
         payload: state.hotspotBatchIndex + 1,
       })
     },
+    updateHotspotPage,
     selectHotspot: (hotspot) => {
       invalidatePromptGeneration()
       dispatch({ type: 'SET_HOTSPOT', payload: hotspot })
@@ -284,6 +313,10 @@ export function WorkflowProvider({ children }: WorkflowProviderProps) {
       dispatch({ type: 'SET_PROMPTS', payload: prompts })
     },
     goToStep: (step) => dispatch({ type: 'GO_TO_STEP', payload: step }),
+    restoreWorkflow: (restoredState) => {
+      invalidatePromptGeneration()
+      dispatch({ type: 'RESTORE', payload: restoredState })
+    },
     resetWorkflow: () => {
       invalidatePromptGeneration()
       dispatch({ type: 'RESET' })

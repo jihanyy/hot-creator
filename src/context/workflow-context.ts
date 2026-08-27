@@ -3,6 +3,7 @@ import type {
   CreativeSelection,
   Creative,
   Hotspot,
+  HotspotPageSnapshot,
   Interest,
   Prompt,
   Script,
@@ -16,6 +17,7 @@ export interface WorkflowContextValue {
   state: WorkflowState
   setInterests: (interests: Interest[]) => void
   refreshHotspots: () => void
+  updateHotspotPage: (page: HotspotPageSnapshot) => void
   selectHotspot: (hotspot: Hotspot) => void
   updateCreatives: (creatives: Creative[]) => void
   selectCreative: (selection: CreativeSelection) => void
@@ -27,6 +29,7 @@ export interface WorkflowContextValue {
   confirmStoryboards: (storyboards: Storyboard[]) => void
   updatePrompts: (prompts: Prompt[]) => void
   goToStep: (step: WorkflowStepId) => void
+  restoreWorkflow: (state: WorkflowState) => void
   resetWorkflow: () => void
 }
 

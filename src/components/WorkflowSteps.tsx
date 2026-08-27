@@ -15,18 +15,7 @@ function WorkflowSteps({
   completedStepIds = [],
 }: WorkflowStepsProps) {
   return (
-    <aside className="workflow-sidebar" aria-label="热点创作工作流">
-      <div className="brand">
-        <span className="brand-mark" aria-hidden="true">
-          H
-        </span>
-        <div className="brand-copy">
-          <strong>祥子绘境</strong>
-          <span>热点内容工作台</span>
-        </div>
-      </div>
-
-      <p className="workflow-heading">创作工作流</p>
+    <section className="workflow-stepper" aria-label="热点创作工作流">
       <nav aria-label="创作步骤">
         <ol className="workflow-list">
           {steps.map((step, index) => {
@@ -50,7 +39,7 @@ function WorkflowSteps({
           })}
         </ol>
       </nav>
-    </aside>
+    </section>
   )
 }
 

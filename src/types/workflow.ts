@@ -39,6 +39,12 @@ export interface Hotspot {
   recommendationReasons?: string[]
 }
 
+export interface HotspotPageSnapshot {
+  interests: Interest[]
+  hotspotBatchIndex: number
+  hotspots: Hotspot[]
+}
+
 export interface Creative {
   id: string
   title: string
@@ -113,6 +119,7 @@ export interface WorkflowState {
   activeStep: WorkflowStepId
   interests: Interest[]
   hotspotBatchIndex: number
+  hotspotPage?: HotspotPageSnapshot | null
   hotspot: Hotspot | null
   creatives: Creative[]
   creativeSelection: CreativeSelection | null

@@ -1,20 +1,83 @@
 :root {
   font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #36312c;
-  background: #faf9f7;
+  color: var(--text);
+  background: var(--bg);
+  color-scheme: light;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
   --accent: #f28a2e;
+  --accent-strong: #d86712;
+  --accent-text: #9d4a0a;
+  --accent-border: #e5c4a5;
+  --accent-surface: #fffaf4;
+  --accent-surface-strong: #fff0df;
+  --bg: #faf9f7;
   --surface: #faf9f7;
+  --surface-primary: #fff;
+  --surface-card: rgba(255, 255, 255, 0.91);
+  --surface-secondary: #f5f3f0;
+  --surface-subtle: #fbfaf8;
+  --surface-hover: rgba(255, 255, 255, 0.82);
+  --header-bg: rgba(255, 255, 255, 0.82);
+  --sidebar-bg: rgba(248, 247, 245, 0.72);
+  --input-bg: #fff;
   --border: #e9e5df;
   --border-strong: #dcd6ce;
   --text: #4e4841;
   --text-strong: #211e1a;
   --text-muted: #7b746c;
   --text-faint: #a59e96;
+  --solid-bg: #29241f;
+  --solid-bg-hover: #171411;
+  --on-solid: #fff;
+  --success: #2e9a5a;
+  --success-text: #2b7148;
+  --success-border: #b9dfc9;
+  --success-surface: #f0faf4;
+  --danger-text: #a33b32;
+  --danger-border: #efc5c0;
+  --danger-surface: #fff4f2;
+  --shadow: rgba(53, 45, 35, 0.075);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --accent: #f28a2e;
+  --accent-strong: #ff9a43;
+  --accent-text: #ffad68;
+  --accent-border: #6f4930;
+  --accent-surface: #31251d;
+  --accent-surface-strong: #3a281b;
+  --bg: #11100f;
+  --surface: #171615;
+  --surface-primary: #211f1d;
+  --surface-card: rgba(35, 33, 31, 0.96);
+  --surface-secondary: #1c1b19;
+  --surface-subtle: #262321;
+  --surface-hover: rgba(255, 255, 255, 0.075);
+  --header-bg: rgba(24, 23, 21, 0.94);
+  --sidebar-bg: rgba(27, 26, 24, 0.96);
+  --input-bg: #242220;
+  --border: #35322f;
+  --border-strong: #4a4641;
+  --text: #d5d0ca;
+  --text-strong: #f4f0eb;
+  --text-muted: #aaa39b;
+  --text-faint: #817a73;
+  --solid-bg: #37332f;
+  --solid-bg-hover: #47413c;
+  --on-solid: #fff;
+  --success: #46ad72;
+  --success-text: #8ed6aa;
+  --success-border: #315b42;
+  --success-surface: #1b3023;
+  --danger-text: #ef9a91;
+  --danger-border: #69413e;
+  --danger-surface: #352321;
+  --shadow: rgba(0, 0, 0, 0.34);
 }
 
 * {
@@ -31,6 +94,8 @@ body,
 
 body {
   min-height: 100dvh;
+  color: var(--text);
+  background: var(--bg);
 }
 
 button,
